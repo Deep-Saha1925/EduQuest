@@ -30,7 +30,7 @@ public class QuestionService {
             }
             quizRepository.save(quiz);
         }else{
-            System.out.println("No quiz on the id");
+            throw new RuntimeException("Quiz not found.");
         }
     }
 
