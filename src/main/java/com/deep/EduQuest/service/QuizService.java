@@ -49,4 +49,16 @@ public class QuizService {
     public void deleteQuiz(Long id) {
         quizRepository.deleteById(id);
     }
+
+    public List<Question> getQuestionsByBatch(Long quizId, int batch, int batchSize) {
+        Quiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) return Collections.emptyList();
+
+        List<Question> allQuestions = quiz.getQuestions();
+        int start = batch * batchSize;
+        int end = Math.min(start + batchSize, allQuestions.size());
+
+        if(start >= allQuestions.size())    return Collections.emptyList();
+        return allQuestions.subList(start, end);
+    }
 }

@@ -33,4 +33,10 @@ public class ResultController {
     public ResponseEntity<List<Result>> getAllResults(){
         return ResponseEntity.ok(resultService.getAllResults());
     }
+
+    @PostMapping("/submit")
+    public ResponseEntity<String> submitAnswers(@RequestBody Result result){
+        resultService.saveResult(result);
+        return ResponseEntity.ok("Result Submitted Successfully.");
+    }
 }

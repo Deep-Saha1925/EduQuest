@@ -5,6 +5,7 @@ import com.deep.EduQuest.model.Quiz;
 import com.deep.EduQuest.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,5 +58,25 @@ public class QuizController {
     public ResponseEntity<String> deleteQuiz(@PathVariable Long id){
         quizService.deleteQuiz(id);
         return ResponseEntity.ok("Quiz deleted Successfully.");
+    }
+
+
+
+    @GetMapping("/quiz/{id}")
+    public String showQuizPage(@PathVariable Long id, Model model) {
+        Quiz quiz = quizService.getQuizById(id);
+        model.addAttribute("quiz", quiz);
+        return "quiz";
+    }
+
+    //get batch of questions
+    @GetMapping("/{quizId}/questions/batch")
+    public ResponseEntity<List<Question>> getQuestionsBatch(
+            @PathVariable Long quizId,
+            @RequestParam(defaultValue = "0") int batch
+    ){
+        int batchSize = 5;
+        List<Question> questions = quizService.getQuestionsByBatch(quizId, batch, batchSize);
+        return ResponseEntity.ok(questions);
     }
 }
