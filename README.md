@@ -1,220 +1,229 @@
-# 🎓 EduQuest — Online Quiz Examination Platform
+# Quiz Application - Subject-Based Selection
 
-EduQuest is an online quiz-taking examination system built using **Spring Boot**, **Spring Data JPA**, and **Thymeleaf (future frontend)**.  
-It allows admins to create quizzes, add questions dynamically, and manage user results — all while ensuring **fairness** by randomizing question sets for each user.
-
----
-
-## 🚀 Features
-
-✅ **Quiz Management**
-- Create quizzes with title, category, and duration.
-- Fetch all quizzes or individual quiz details.
-- Delete quizzes when needed.
-
-✅ **Question Management**
-- Add multiple questions to any quiz by ID.
-- Retrieve questions by quiz or question ID.
-- Each question is linked to its parent quiz dynamically.
-
-✅ **Result Tracking**
-- Store quiz results for each user.
-- Fetch all results or filter them by user ID.
-
-✅ **User Management**
-- Register and view users.
-- Fetch user details by ID.
-
-✅ **Smart Data Handling**
-- Reduces complexity by storing **only question IDs** when showing quiz patterns.
-- Avoids data redundancy and circular references using `@JsonManagedReference` and `@JsonBackReference`.
+A modern quiz application with subject-specific selection, interactive UI, and improved user experience.
 
 ---
 
-## 🧱 Tech Stack
+## 🎯 New Features
 
-| Layer | Technology Used |
-|-------|------------------|
-| **Backend** | Spring Boot 3, Spring Web, Spring Data JPA |
-| **Database** | MySQL |
-| **Security** | Spring Security (Basic config for REST testing) |
-| **Build Tool** | Maven |
-| **Testing** | Postman |
-| **Frontend (Planned)** | Thymeleaf + Bootstrap 5 |
+### Subject Cards on Home Page
+Students now see beautiful, interactive cards for each subject category on the home page. Each card includes:
+
+- Category-specific icons (Networking, Java, Python, Database, Web Development)
+- Color-coded design for easy identification
+- Hover effects with smooth animations
+- Direct links to start a quiz in that subject
+
+### Category Selection Flow
+1. **Home Page (`/`)** - Displays all available subjects as cards
+2. **Category Selection (`/quiz/category/{category}`)** - Shows quiz configuration options
+3. **Quiz Questions (`/quiz/question`)** - Category-specific questions
+4. **Results Page (`/quiz/result`)** - Shows category badge and detailed results
 
 ---
 
-## 📁 Project Structure
-EduQuest/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── deep/
-│   │   │           └── EduQuest/
-│   │   │               ├── controller/
-│   │   │               │   ├── QuestionController.java
-│   │   │               │   ├── QuizController.java
-│   │   │               │   ├── ResultController.java
-│   │   │               │   └── UserController.java
-│   │   │               │
-│   │   │               ├── model/
-│   │   │               │   ├── Question.java
-│   │   │               │   ├── Quiz.java
-│   │   │               │   ├── Result.java
-│   │   │               │   └── User.java
-│   │   │               │
-│   │   │               ├── repository/
-│   │   │               │   ├── QuestionRepository.java
-│   │   │               │   ├── QuizRepository.java
-│   │   │               │   ├── ResultRepository.java
-│   │   │               │   └── UserRepository.java
-│   │   │               │
-│   │   │               ├── service/
-│   │   │               │   ├── QuestionService.java
-│   │   │               │   ├── QuizService.java
-│   │   │               │   ├── ResultService.java
-│   │   │               │   └── UserService.java
-│   │   │               │
-│   │   │               ├── config/
-│   │   │               │   └── SecurityConfig.java
-│   │   │               │
-│   │   │               └── EduQuestApplication.java
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── static/             # (for CSS, JS, images - future frontend)
-│   │       └── templates/          # (for Thymeleaf templates)
-│   │
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── deep/
-│                   └── EduQuest/
-│                       └── EduQuestApplicationTests.java
-│
-├── pom.xml
-└── README.md
+## 📋 Updated Files
+
+### Backend Changes
+
+**QuizController.java**
+- Added `getAllCategories()` to fetch unique categories
+- Added `/quiz/category/{category}` route for category selection
+- Updated `/quiz/start` to handle category-based quizzes
+- Updated `/quiz/result` to display quiz category
+
+**QuizService.java**
+- Added `getAllCategories()` to get distinct categories from database
+- Returns sorted list of all unique categories
+
+### Frontend Changes
+
+**index.html (Home Page)**
+- Redesigned with dynamic subject cards
+- Category-specific icons (5 predefined + default icon)
+- Responsive grid layout (1 column mobile, 2 columns tablet, 3 columns desktop)
+- Empty state when no questions are available
+
+**category-selection.html (NEW)**
+- Quiz configuration page for selected category
+- Shows available question count
+- Radio button selection for number of questions (5, 10, 15, 20)
+- Category-specific styling and icons
+- Back button to return to subject selection
+- Information box with quiz details
+
+**result.html**
+- Added category badge at the top
+- Shows which subject the quiz was taken from
+
+---
+
+## 🎨 Design Features
+
+### Color Coding by Subject
+- **Networking** - Blue theme
+- **Java** - Red theme
+- **Python** - Green theme
+- **Database** - Yellow theme
+- **Web Development** - Purple theme
+- **Other Categories** - Indigo theme (default)
+
+### Icons by Subject
+Each category has a unique SVG icon:
+
+| Category | Icon |
+|----------|------|
+| 🌐 Networking | Globe/Network icon |
+| ☕ Java | Code brackets icon |
+| 🐍 Python | Terminal/Code icon |
+| 🗄️ Database | Database cylinders icon |
+| 🌍 Web Development | Web/Globe icon |
+| 📚 Default | Book icon for other categories |
+
+---
+
+## 🚀 User Flow
+Home Page
+↓
+Select Subject Card
+↓
+Category Selection Page (choose question count)
+↓
+Quiz Questions (category-specific)
+↓
+Results Page (with category badge)
+↓
+Try Again or Go Home
+
+pgsql
+Copy code
+
+---
+
+## 📊 How It Works
+
+### Category Detection
+- Automatically detects all unique categories from the `questions` table
+- Auto-discovered from existing questions
+- Sorted alphabetically
+- Filters out null/empty values
+
+### Question Selection
+- System fetches all questions from the selected category
+- Randomly selects the specified number of questions
+- Presents questions one by one
+- Tracks the category throughout the session
+
+### Database Query Example
+```sql
+SELECT * FROM questions 
+WHERE category = 'Java' 
+ORDER BY RAND() 
+LIMIT 10;
+🎓 Benefits
+Focused Learning - Practice specific subjects
+
+Better Organization - Questions grouped by topic
+
+Improved UX - Visual, card-based interface
+
+Flexible - Easy to add new categories
+
+Responsive - Works on all device sizes
+
+🔧 Technical Details
+Session Variables
+quizQuestions - List of selected questions
+
+quizCategory - Current quiz category
+
+currentQuestionIndex - Progress tracker
+
+userAnswers - Student's responses
+
+Routes Summary
+Route	Method	Purpose
+/	GET	Home page with subject cards
+/quiz/category/{category}	GET	Category selection page
+/quiz/start?count={n}&category={cat}	GET	Start category-specific quiz
+/quiz/question	GET	Display current question
+/quiz/answer	POST	Submit answer and move to next
+/quiz/result	GET	Show final results
+/admin	GET	Admin panel
+
+🎯 Demo Data
+The SQL script includes 125 questions across 5 categories:
+
+Networking - 25 questions
+
+Java - 25 questions
+
+Python - 25 questions
+
+Database - 25 questions
+
+Web Development - 25 questions
+
+💡 Future Enhancements
+⏱️ Timer for each question
+
+📊 Subject-wise performance analytics
+
+🏆 Leaderboard per category
+
+🔒 User authentication
+
+📱 Progressive Web App (PWA)
+
+📧 Email results
+
+📄 PDF certificate generation
+
+🎮 Gamification (badges, points)
+
+🐛 Troubleshooting
+No subjects showing?
+
+Ensure questions exist in the database
+
+Verify category field is filled
+
+Run the demo SQL script to populate data
+
+Category not working?
+
+Verify category names match exactly (case-sensitive)
+
+Check MySQL connection settings
+
+Ensure quiz_db database exists
+
+Styling issues?
+
+Clear browser cache
+
+Check internet connection (Tailwind CSS loads from CDN)
+
+Ensure all HTML files are in src/main/resources/templates/
+
+📝 Notes
+Categories are case-sensitive in the database
+
+Empty categories won’t appear on the home page
+
+Questions are selected randomly each time
+
+Session data is cleared when starting a new quiz
+
+Admin panel remains unchanged for managing questions
+
+Enjoy your enhanced Quiz Application! 🎉
+
 yaml
 Copy code
 
 ---
 
-## ⚙️ Configuration
+I can also **convert this README into a GitHub-friendly version with badges, GIF demo, and collapsible sections** to make it more attractive for your repo.  
 
-Edit your `src/main/resources/application.properties` file:
-
-```properties
-# Database Config
-spring.datasource.url=jdbc:mysql://localhost:3306/eduquest_db
-spring.datasource.username=root
-spring.datasource.password=yourpassword
-spring.jpa.hibernate.ddl-auto=update
-
-# JPA Config
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-🔗 API Endpoints (Phase 1 & 2)
-🎯 Quiz APIs
-Method	Endpoint	Description
-POST	/api/quizzes	Create a new quiz
-GET	/api/quizzes	Get all quizzes
-GET	/api/quizzes/{id}	Get quiz by ID (with questions)
-DELETE	/api/quizzes/{id}	Delete a quiz
-GET	/api/quizzes/{id}/questions	Get all questions for a quiz
-GET	/api/quizzes/{id}/random-questions	Get shuffled question IDs for randomization
-
-❓ Question APIs
-Method	Endpoint	Description
-POST	/api/questions/{quizId}	Add questions to a specific quiz
-GET	/api/questions	Fetch all questions
-GET	/api/questions/{id}	Get a specific question by ID
-
-👤 User APIs
-Method	Endpoint	Description
-POST	/api/users	Register a new user
-GET	/api/users	Get all users
-GET	/api/users/{id}	Get user by ID
-
-📊 Result APIs
-Method	Endpoint	Description
-POST	/api/results	Save a user's quiz result
-GET	/api/results	Get all results
-GET	/api/results/user/{userId}	Get results by user ID
-
-🧪 Example Test Data (for Postman)
-Create Quiz
-json
-Copy code
-{
-  "title": "Java Basics",
-  "category": "Programming",
-  "duration": 10
-}
-Add Questions
-POST /api/questions/1
-
-json
-Copy code
-[
-  {
-    "questionText": "What is JVM in Java?",
-    "optionA": "Java Virtual Machine",
-    "optionB": "Java Vendor Machine",
-    "optionC": "Java Version Manager",
-    "optionD": "None of these",
-    "correctAnswer": "A"
-  },
-  {
-    "questionText": "Which keyword is used to inherit a class in Java?",
-    "optionA": "this",
-    "optionB": "super",
-    "optionC": "extends",
-    "optionD": "inherits",
-    "correctAnswer": "C"
-  }
-]
-🧩 Upcoming Phases
-Phase 3: Frontend Integration (Thymeleaf UI)
-
-User login and quiz-taking UI.
-
-Timer-based quiz attempts.
-
-Result visualization dashboard.
-
-Phase 4: Advanced Features
-
-Question randomization logic per user.
-
-Leaderboard & result analysis.
-
-JWT-based user authentication.
-
-🧑‍💻 Author
-👤 Deep Saha
-🚀 Java Developer | Backend Enthusiast | Builder of EduQuest
-🔗 GitHub • LinkedIn
-
-⭐ Contribute
-Fork this repository
-
-Create a new branch: feature/your-feature-name
-
-Commit your changes
-
-Push and create a Pull Request
-
-🏁 License
-This project is licensed under the MIT License — free to use, modify, and share!
-
-“EduQuest — Empowering fair and intelligent online assessments.”
-
-yaml
-Copy code
-
----
-
-Would you like me to include **database diagram (ERD)** and a **Postman collection export** section in the README too?  
-That’ll make it look even more professional for your GitHub repo.
+Do you want me to do that next?

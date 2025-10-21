@@ -14,27 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/quiz")
 public class QuizController {
 
     @Autowired
     private QuizService quizService;
 
-    @GetMapping("/")
-    public String home(Model model) {
-        // Get all unique categories
-        List<String> categories = quizService.getAllCategories();
-        model.addAttribute("categories", categories);
-        return "index";
-    }
-
-    @GetMapping("/quiz/category/{category}")
+    @GetMapping("/category/{category}")
     public String selectCategory(@PathVariable String category, Model model) {
         model.addAttribute("category", category);
         model.addAttribute("questionCount", quizService.getQuestionsByCategory(category).size());
         return "category-selection";
     }
 
-    @GetMapping("/quiz/start")
+    @GetMapping("/start")
     public String startQuiz(@RequestParam(defaultValue = "10") int count,
                             @RequestParam(required = false) String category,
                             HttpSession session, Model model) {
@@ -60,7 +53,7 @@ public class QuizController {
         return "redirect:/quiz/question";
     }
 
-    @GetMapping("/quiz/question")
+    @GetMapping("/question")
     public String showQuestion(HttpSession session, Model model) {
         @SuppressWarnings("unchecked")
         List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
@@ -82,7 +75,7 @@ public class QuizController {
         return "question";
     }
 
-    @PostMapping("/quiz/answer")
+    @PostMapping("/answer")
     public String submitAnswer(@RequestParam(required = false) String answer,
                                HttpSession session) {
         @SuppressWarnings("unchecked")
@@ -97,7 +90,7 @@ public class QuizController {
         return "redirect:/quiz/question";
     }
 
-    @GetMapping("/quiz/result")
+    @GetMapping("/result")
     public String showResult(HttpSession session, Model model) {
         @SuppressWarnings("unchecked")
         List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
@@ -123,40 +116,4 @@ public class QuizController {
         return "result";
     }
 
-    // Admin Routes
-    @GetMapping("/admin")
-    public String adminPanel(Model model) {
-        model.addAttribute("questions", quizService.getAllQuestions());
-        return "admin";
-    }
-
-    @GetMapping("/admin/question/new")
-    public String newQuestionForm(Model model) {
-        model.addAttribute("question", new Question());
-        return "question-form";
-    }
-
-    @GetMapping("/admin/question/edit/{id}")
-    public String editQuestionForm(@PathVariable Long id, Model model) {
-        Question question = quizService.getQuestionById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid question Id:" + id));
-        model.addAttribute("question", question);
-        return "question-form";
-    }
-
-    @PostMapping("/admin/question/save")
-    public String saveQuestion(@Valid @ModelAttribute Question question,
-                               BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return "question-form";
-        }
-        quizService.saveQuestion(question);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/question/delete/{id}")
-    public String deleteQuestion(@PathVariable Long id) {
-        quizService.deleteQuestion(id);
-        return "redirect:/admin";
-    }
 }
