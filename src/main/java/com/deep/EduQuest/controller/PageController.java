@@ -17,7 +17,7 @@ public class PageController {
     @GetMapping("/")
     public String showDashboard(Model model) {
         model.addAttribute("quizzes", quizService.getAllQuizzes());
-        return "dashboard"; // Thymeleaf template
+        return "dashboard";
     }
 
     @GetMapping("/register")

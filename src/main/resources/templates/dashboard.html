@@ -11,7 +11,7 @@
     <h2 class="mb-4 text-center">Available Quizzes</h2>
     <div class="list-group">
         <a th:each="quiz : ${quizzes}"
-           th:href="@{'/api/quizzes/questions/batch/' + ${quiz.id}}"
+           th:href="@{'/api/quizzes/quiz/' + ${quiz.id}}"
            class="list-group-item list-group-item-action">
             <span th:text="${quiz.title}">Quiz Title</span> -
             <small th:text="${quiz.category}">Category</small>

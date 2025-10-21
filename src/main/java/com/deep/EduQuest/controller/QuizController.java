@@ -59,8 +59,7 @@ public class QuizController {
         quizService.deleteQuiz(id);
         return ResponseEntity.ok("Quiz deleted Successfully.");
     }
-
-
+    
 
     @GetMapping("/quiz/{id}")
     public String showQuizPage(@PathVariable Long id, Model model) {
