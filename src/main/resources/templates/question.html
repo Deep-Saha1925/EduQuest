@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Question</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-4xl w-full">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-gray-600">Progress</span>
+                <span class="text-sm font-semibold text-purple-600">
+                        Question <span th:text="${questionNumber}"></span> of <span th:text="${totalQuestions}"></span>
+                    </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full transition-all duration-500 ease-out"
+                     th:style="'width: ' + ${questionNumber * 100 / totalQuestions} + '%'"></div>
+            </div>
+        </div>
+
+        <!-- Question Number Badge -->
+        <div class="mb-6">
+                <span class="inline-block bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-bold">
+                    Question <span th:text="${questionNumber}"></span>
+                </span>
+        </div>
+
+        <!-- Question Text -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 leading-relaxed" th:text="${question.questionText}"></h2>
+
+        <!-- Answer Form -->
+        <form action="/quiz/answer" method="post" id="quizForm">
+            <div class="space-y-4 mb-8">
+                <!-- Option A -->
+                <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition duration-200 group">
+                    <input type="radio" name="answer" th:value="${question.optionA}" required
+                           class="mt-1 w-5 h-5 text-purple-600 focus:ring-2 focus:ring-purple-500">
+                    <span class="ml-4 flex-1">
+                            <span class="font-semibold text-purple-600 mr-2">A.</span>
+                            <span class="text-gray-700 text-lg" th:text="${question.optionA}"></span>
+                        </span>
+                </label>
+
+                <!-- Option B -->
+                <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition duration-200 group">
+                    <input type="radio" name="answer" th:value="${question.optionB}" required
+                           class="mt-1 w-5 h-5 text-purple-600 focus:ring-2 focus:ring-purple-500">
+                    <span class="ml-4 flex-1">
+                            <span class="font-semibold text-purple-600 mr-2">B.</span>
+                            <span class="text-gray-700 text-lg" th:text="${question.optionB}"></span>
+                        </span>
+                </label>
+
+                <!-- Option C -->
+                <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition duration-200 group">
+                    <input type="radio" name="answer" th:value="${question.optionC}" required
+                           class="mt-1 w-5 h-5 text-purple-600 focus:ring-2 focus:ring-purple-500">
+                    <span class="ml-4 flex-1">
+                            <span class="font-semibold text-purple-600 mr-2">C.</span>
+                            <span class="text-gray-700 text-lg" th:text="${question.optionC}"></span>
+                        </span>
+                </label>
+
+                <!-- Option D -->
+                <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition duration-200 group">
+                    <input type="radio" name="answer" th:value="${question.optionD}" required
+                           class="mt-1 w-5 h-5 text-purple-600 focus:ring-2 focus:ring-purple-500">
+                    <span class="ml-4 flex-1">
+                            <span class="font-semibold text-purple-600 mr-2">D.</span>
+                            <span class="text-gray-700 text-lg" th:text="${question.optionD}"></span>
+                        </span>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition duration-200 shadow-lg hover:shadow-xl">
+                    <span class="flex items-center justify-center">
+                        <span th:if="${questionNumber < totalQuestions}">Next Question</span>
+                        <span th:if="${questionNumber >= totalQuestions}">Finish Quiz</span>
+                        <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </span>
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

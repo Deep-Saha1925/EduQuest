@@ -1,64 +1,59 @@
 package com.deep.EduQuest.service;
 
 import com.deep.EduQuest.model.Question;
-import com.deep.EduQuest.model.Quiz;
 import com.deep.EduQuest.repository.QuestionRepository;
-import com.deep.EduQuest.repository.QuizRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuizService {
 
-    private final QuizRepository quizRepository;
-    private final QuestionRepository questionRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository) {
-        this.quizRepository = quizRepository;
-        this.questionRepository = questionRepository;
+    public List<Question> getAllQuestions() {
+        return questionRepository.findAll();
     }
 
-    //fetch quiz by ID
-    public Quiz getQuizById(Long id){
-        return quizRepository.findById(id).orElse(null);
+    public Optional<Question> getQuestionById(Long id) {
+        return questionRepository.findById(id);
     }
 
-    //fetch only question ids for a quiz
-    public List<Long> getQuestionIdsByQuiz(long quizId){
-        List<Question> questions = questionRepository.findByQuizId(quizId);
-        Collections.shuffle(questions);
-        return questions.stream().map(Question::getId).toList();
+    public Question saveQuestion(Question question) {
+        return questionRepository.save(question);
     }
 
-    // Get question by QUIZ_ID
-    public List<Question> getQuestionsById(Long quizId){
-        return questionRepository.findByQuizId(quizId);
+    public void deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
     }
 
-    //creating a new quiz
-    public Quiz createQuiz(Quiz quiz) {
-        return quizRepository.save(quiz);
+    public List<Question> getRandomQuestions(int count) {
+        return questionRepository.findRandomQuestions(count);
     }
 
-    public List<Quiz> getAllQuizzes() {
-        return quizRepository.findAll();
+    public List<Question> getQuestionsByCategory(String category) {
+        return questionRepository.findByCategory(category);
     }
 
-    public void deleteQuiz(Long id) {
-        quizRepository.deleteById(id);
+    public List<Question> getRandomQuestionsByCategory(String category, int count) {
+        return questionRepository.findRandomQuestionsByCategory(category, count);
     }
 
-    public List<Question> getQuestionsByBatch(Long quizId, int batch, int batchSize) {
-        Quiz quiz = quizRepository.findById(quizId).orElse(null);
-        if (quiz == null) return Collections.emptyList();
+    public int calculateScore(List<Question> questions, List<String> userAnswers) {
+        int score = 0;
+        for (int i = 0; i < questions.size(); i++) {
+            if (i < userAnswers.size() &&
+                    questions.get(i).getCorrectAnswer().equals(userAnswers.get(i))) {
+                score++;
+            }
+        }
+        return score;
+    }
 
-        List<Question> allQuestions = quiz.getQuestions();
-        int start = batch * batchSize;
-        int end = Math.min(start + batchSize, allQuestions.size());
-
-        if(start >= allQuestions.size())    return Collections.emptyList();
-        return allQuestions.subList(start, end);
+    public List<String> getAllCategories() {
+        return questionRepository.getAllCategories();
     }
 }

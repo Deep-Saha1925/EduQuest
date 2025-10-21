@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 min-h-screen p-4 py-8">
+<div class="max-w-5xl mx-auto">
+    <!-- Results Header -->
+    <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-6">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Quiz Completed!</h1>
+            <p class="text-xl text-gray-600 mb-8">Here's how you performed</p>
+
+            <!-- Score Circle -->
+            <div class="flex justify-center mb-8">
+                <div class="relative w-48 h-48 md:w-64 md:h-64">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full shadow-2xl flex flex-col items-center justify-center">
+                        <div class="text-white">
+                            <div class="text-6xl md:text-7xl font-bold" th:text="${score} + '/' + ${total}"></div>
+                            <div class="text-xl md:text-2xl mt-2">Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Percentage -->
+            <div class="mb-8">
+                <div class="inline-block bg-purple-100 px-8 py-4 rounded-2xl">
+                    <span class="text-3xl font-bold text-purple-800" th:text="${percentage} + '%'"></span>
+                    <span class="text-gray-600 ml-2">Accuracy</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/"
+                   class="inline-flex items-center justify-center px-8 py-4 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Answer Review -->
+    <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-8 h-8 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            Answer Review
+        </h2>
+
+        <div class="space-y-6">
+            <div th:each="question, iterStat : ${questions}"
+                 class="border-l-4 rounded-lg p-6 transition duration-200"
+                 th:classappend="${questions[iterStat.index].correctAnswer == userAnswers[iterStat.index]} ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'">
+
+                <!-- Question Number and Status -->
+                <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        Question <span th:text="${iterStat.index + 1}"></span>
+                    </h3>
+                    <span th:if="${questions[iterStat.index].correctAnswer == userAnswers[iterStat.index]}"
+                          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-200 text-green-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Correct
+                        </span>
+                    <span th:unless="${questions[iterStat.index].correctAnswer == userAnswers[iterStat.index]}"
+                          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-200 text-red-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            Incorrect
+                        </span>
+                </div>
+
+                <!-- Question Text -->
+                <p class="text-gray-700 font-medium mb-4" th:text="${question.questionText}"></p>
+
+                <!-- Your Answer -->
+                <div class="mb-2">
+                    <span class="font-semibold text-gray-600">Your Answer: </span>
+                    <span th:classappend="${questions[iterStat.index].correctAnswer == userAnswers[iterStat.index]} ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'">
+                            <span th:text="${userAnswers[iterStat.index] != null && userAnswers[iterStat.index] != ''} ? ${userAnswers[iterStat.index]} : 'Not Answered'"></span>
+                        </span>
+                </div>
+
+                <!-- Correct Answer -->
+                <div th:if="${questions[iterStat.index].correctAnswer != userAnswers[iterStat.index]}">
+                    <span class="font-semibold text-gray-600">Correct Answer: </span>
+                    <span class="text-green-700 font-semibold" th:text="${question.correctAnswer}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

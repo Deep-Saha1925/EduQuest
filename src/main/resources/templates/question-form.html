@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${question.id != null} ? 'Edit Question' : 'Add New Question'">Question Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 min-h-screen py-8 px-4">
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-t-3xl shadow-2xl p-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800"
+                    th:text="${question.id != null} ? 'Edit Question' : 'Add New Question'"></h1>
+                <p class="text-gray-600 mt-1">Fill in the details below</p>
+            </div>
+            <a href="/admin"
+               class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-b-3xl shadow-2xl p-8">
+        <form th:action="@{/admin/question/save}" th:object="${question}" method="post" class="space-y-6">
+            <!-- Hidden ID field for edit -->
+            <input type="hidden" th:field="*{id}" />
+
+            <!-- Question Text -->
+            <div>
+                <label for="questionText" class="block text-sm font-bold text-gray-700 mb-2">
+                    Question Text *
+                </label>
+                <textarea id="questionText"
+                          th:field="*{questionText}"
+                          rows="3"
+                          required
+                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                          placeholder="Enter your question here..."></textarea>
+                <p th:if="${#fields.hasErrors('questionText')}"
+                   th:errors="*{questionText}"
+                   class="mt-2 text-sm text-red-600"></p>
+            </div>
+
+            <!-- Options Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Option A -->
+                <div>
+                    <label for="optionA" class="block text-sm font-bold text-gray-700 mb-2">Option A *</label>
+                    <input type="text" id="optionA" th:field="*{optionA}" required
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                           placeholder="First option" />
+                    <p th:if="${#fields.hasErrors('optionA')}" th:errors="*{optionA}" class="mt-2 text-sm text-red-600"></p>
+                </div>
+
+                <!-- Option B -->
+                <div>
+                    <label for="optionB" class="block text-sm font-bold text-gray-700 mb-2">Option B *</label>
+                    <input type="text" id="optionB" th:field="*{optionB}" required
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                           placeholder="Second option" />
+                    <p th:if="${#fields.hasErrors('optionB')}" th:errors="*{optionB}" class="mt-2 text-sm text-red-600"></p>
+                </div>
+
+                <!-- Option C -->
+                <div>
+                    <label for="optionC" class="block text-sm font-bold text-gray-700 mb-2">Option C *</label>
+                    <input type="text" id="optionC" th:field="*{optionC}" required
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                           placeholder="Third option" />
+                    <p th:if="${#fields.hasErrors('optionC')}" th:errors="*{optionC}" class="mt-2 text-sm text-red-600"></p>
+                </div>
+
+                <!-- Option D -->
+                <div>
+                    <label for="optionD" class="block text-sm font-bold text-gray-700 mb-2">Option D *</label>
+                    <input type="text" id="optionD" th:field="*{optionD}" required
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                           placeholder="Fourth option" />
+                    <p th:if="${#fields.hasErrors('optionD')}" th:errors="*{optionD}" class="mt-2 text-sm text-red-600"></p>
+                </div>
+            </div>
+
+            <!-- Correct Answer, Category, Difficulty -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Correct Answer -->
+                <div>
+                    <label for="correctAnswer" class="block text-sm font-bold text-gray-700 mb-2">Correct Answer *</label>
+                    <select id="correctAnswer" th:field="*{correctAnswer}" required
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200">
+                        <option value="">Select answer</option>
+                        <option value="" id="optA">A</option>
+                        <option value="" id="optB">B</option>
+                        <option value="" id="optC">C</option>
+                        <option value="" id="optD">D</option>
+                    </select>
+                    <p th:if="${#fields.hasErrors('correctAnswer')}" th:errors="*{correctAnswer}" class="mt-2 text-sm text-red-600"></p>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="category" class="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                    <input type="text" id="category" th:field="*{category}"
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200"
+                           placeholder="e.g., Science" />
+                </div>
+
+                <!-- Difficulty -->
+                <div>
+                    <label for="difficulty" class="block text-sm font-bold text-gray-700 mb-2">Difficulty</label>
+                    <select id="difficulty" th:field="*{difficulty}"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition duration-200">
+                        <option value="">Select difficulty</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex gap-4 pt-6">
+                <button type="submit"
+                        class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-xl hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition duration-200 shadow-lg hover:shadow-xl">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Question
+                    </span>
+                </button>
+                <a href="/admin"
+                   class="flex-1 bg-gray-200 text-gray-700 font-bold py-4 px-8 rounded-xl hover:bg-gray-300 transition duration-200 text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Get option inputs
+    const optionA = document.getElementById('optionA');
+    const optionB = document.getElementById('optionB');
+    const optionC = document.getElementById('optionC');
+    const optionD = document.getElementById('optionD');
+
+    // Get select options
+    const selectA = document.getElementById('optA');
+    const selectB = document.getElementById('optB');
+    const selectC = document.getElementById('optC');
+    const selectD = document.getElementById('optD');
+
+    // Function to update select values dynamically
+    function updateSelectOptions() {
+        selectA.value = optionA.value;
+        selectA.textContent = optionA.value || "A";
+
+        selectB.value = optionB.value;
+        selectB.textContent = optionB.value || "B";
+
+        selectC.value = optionC.value;
+        selectC.textContent = optionC.value || "C";
+
+        selectD.value = optionD.value;
+        selectD.textContent = optionD.value || "D";
+    }
+
+    // Add input event listeners
+    optionA.addEventListener('input', updateSelectOptions);
+    optionB.addEventListener('input', updateSelectOptions);
+    optionC.addEventListener('input', updateSelectOptions);
+    optionD.addEventListener('input', updateSelectOptions);
+
+    // Initialize select on page load (important for edit)
+    updateSelectOptions();
+</script>
+</body>
+</html>

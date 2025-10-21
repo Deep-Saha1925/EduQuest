@@ -1,30 +1,49 @@
 package com.deep.EduQuest.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "questions")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Table(name = "questions")
 public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Question text is required")
+    @Column(nullable = false, length = 500)
     private String questionText;
+
+    @NotBlank(message = "Option A is required")
+    @Column(nullable = false)
     private String optionA;
+
+    @NotBlank(message = "Option B is required")
+    @Column(nullable = false)
     private String optionB;
+
+    @NotBlank(message = "Option C is required")
+    @Column(nullable = false)
     private String optionC;
+
+    @NotBlank(message = "Option D is required")
+    @Column(nullable = false)
     private String optionD;
+
+    @NotBlank(message = "Correct answer is required")
+    @Column(nullable = false)
     private String correctAnswer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id")
-    @JsonBackReference
-    private Quiz quiz;
+    @Column(length = 100)
+    private String category;
 
+    @Column(length = 20)
+    private String difficulty; // Easy, Medium, Hard
 }

@@ -1,81 +1,162 @@
 package com.deep.EduQuest.controller;
 
 import com.deep.EduQuest.model.Question;
-import com.deep.EduQuest.model.Quiz;
 import com.deep.EduQuest.service.QuizService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/quizzes")
+@Controller
 public class QuizController {
 
-    private final QuizService quizService;
+    @Autowired
+    private QuizService quizService;
 
-    public QuizController(QuizService quizService) {
-        this.quizService = quizService;
+    @GetMapping("/")
+    public String home(Model model) {
+        // Get all unique categories
+        List<String> categories = quizService.getAllCategories();
+        model.addAttribute("categories", categories);
+        return "index";
     }
 
-    //create a quiz
-    @PostMapping
-    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz){
-        return ResponseEntity.ok(quizService.createQuiz(quiz));
+    @GetMapping("/quiz/category/{category}")
+    public String selectCategory(@PathVariable String category, Model model) {
+        model.addAttribute("category", category);
+        model.addAttribute("questionCount", quizService.getQuestionsByCategory(category).size());
+        return "category-selection";
     }
 
-    //get all quizzes
-    @GetMapping
-    public ResponseEntity<List<Quiz>> getAllQuizzes(){
-        return ResponseEntity.ok(quizService.getAllQuizzes());
+    @GetMapping("/quiz/start")
+    public String startQuiz(@RequestParam(defaultValue = "10") int count,
+                            @RequestParam(required = false) String category,
+                            HttpSession session, Model model) {
+        List<Question> questions;
+
+        if (category != null && !category.isEmpty()) {
+            questions = quizService.getRandomQuestionsByCategory(category, count);
+            session.setAttribute("quizCategory", category);
+        } else {
+            questions = quizService.getRandomQuestions(count);
+            session.setAttribute("quizCategory", "All Categories");
+        }
+
+        session.setAttribute("quizQuestions", questions);
+        session.setAttribute("currentQuestionIndex", 0);
+        session.setAttribute("userAnswers", new ArrayList<String>());
+
+        if (questions.isEmpty()) {
+            model.addAttribute("error", "No questions available for this category. Please try another category.");
+            return "index";
+        }
+
+        return "redirect:/quiz/question";
     }
 
-    //get quiz by id
-    @GetMapping("/{id}")
-    public ResponseEntity<Quiz> getQuizById(@PathVariable Long id){
-        Quiz quiz = quizService.getQuizById(id);
-        return quiz != null ? ResponseEntity.ok(quiz) : ResponseEntity.notFound().build();
+    @GetMapping("/quiz/question")
+    public String showQuestion(HttpSession session, Model model) {
+        @SuppressWarnings("unchecked")
+        List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
+        Integer currentIndex = (Integer) session.getAttribute("currentQuestionIndex");
+
+        if (questions == null || currentIndex == null) {
+            return "redirect:/";
+        }
+
+        if (currentIndex >= questions.size()) {
+            return "redirect:/quiz/result";
+        }
+
+        Question currentQuestion = questions.get(currentIndex);
+        model.addAttribute("question", currentQuestion);
+        model.addAttribute("questionNumber", currentIndex + 1);
+        model.addAttribute("totalQuestions", questions.size());
+
+        return "question";
     }
 
-    //get all questions for a quiz
-    @GetMapping("/{id}/questions")
-    public ResponseEntity<List<Question>> getQuestionsByQuizId(@PathVariable Long id){
-        Quiz quiz = quizService.getQuizById(id);
-        return quiz != null ? ResponseEntity.ok(quizService.getQuestionsById(id)) : ResponseEntity.notFound().build();
+    @PostMapping("/quiz/answer")
+    public String submitAnswer(@RequestParam(required = false) String answer,
+                               HttpSession session) {
+        @SuppressWarnings("unchecked")
+        List<String> userAnswers = (List<String>) session.getAttribute("userAnswers");
+        Integer currentIndex = (Integer) session.getAttribute("currentQuestionIndex");
+
+        if (userAnswers != null && currentIndex != null) {
+            userAnswers.add(answer != null ? answer : "");
+            session.setAttribute("currentQuestionIndex", currentIndex + 1);
+        }
+
+        return "redirect:/quiz/question";
     }
 
-    //get Random question ids for a quiz
-    @GetMapping("/{quizId}/random-questions")
-    public ResponseEntity<List<Long>> getRandomQuestionsByQuizId(@PathVariable Long quizId){
-        Quiz quiz = quizService.getQuizById(quizId);
-        return quiz != null ? ResponseEntity.ok(quizService.getQuestionIdsByQuiz(quizId)) : ResponseEntity.notFound().build();
+    @GetMapping("/quiz/result")
+    public String showResult(HttpSession session, Model model) {
+        @SuppressWarnings("unchecked")
+        List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
+        @SuppressWarnings("unchecked")
+        List<String> userAnswers = (List<String>) session.getAttribute("userAnswers");
+        String category = (String) session.getAttribute("quizCategory");
+
+        if (questions == null || userAnswers == null) {
+            return "redirect:/";
+        }
+
+        int score = quizService.calculateScore(questions, userAnswers);
+        int total = questions.size();
+        double percentage = (score * 100.0) / total;
+
+        model.addAttribute("score", score);
+        model.addAttribute("total", total);
+        model.addAttribute("percentage", String.format("%.2f", percentage));
+        model.addAttribute("questions", questions);
+        model.addAttribute("userAnswers", userAnswers);
+        model.addAttribute("category", category != null ? category : "General");
+
+        return "result";
     }
 
-    //Delete quiz
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteQuiz(@PathVariable Long id){
-        quizService.deleteQuiz(id);
-        return ResponseEntity.ok("Quiz deleted Successfully.");
-    }
-    
-
-    @GetMapping("/quiz/{id}")
-    public String showQuizPage(@PathVariable Long id, Model model) {
-        Quiz quiz = quizService.getQuizById(id);
-        model.addAttribute("quiz", quiz);
-        return "quiz";
+    // Admin Routes
+    @GetMapping("/admin")
+    public String adminPanel(Model model) {
+        model.addAttribute("questions", quizService.getAllQuestions());
+        return "admin";
     }
 
-    //get batch of questions
-    @GetMapping("/{quizId}/questions/batch")
-    public ResponseEntity<List<Question>> getQuestionsBatch(
-            @PathVariable Long quizId,
-            @RequestParam(defaultValue = "0") int batch
-    ){
-        int batchSize = 5;
-        List<Question> questions = quizService.getQuestionsByBatch(quizId, batch, batchSize);
-        return ResponseEntity.ok(questions);
+    @GetMapping("/admin/question/new")
+    public String newQuestionForm(Model model) {
+        model.addAttribute("question", new Question());
+        return "question-form";
+    }
+
+    @GetMapping("/admin/question/edit/{id}")
+    public String editQuestionForm(@PathVariable Long id, Model model) {
+        Question question = quizService.getQuestionById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid question Id:" + id));
+        model.addAttribute("question", question);
+        return "question-form";
+    }
+
+    @PostMapping("/admin/question/save")
+    public String saveQuestion(@Valid @ModelAttribute Question question,
+                               BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "question-form";
+        }
+        quizService.saveQuestion(question);
+        return "redirect:/admin";
+    }
+
+    @GetMapping("/admin/question/delete/{id}")
+    public String deleteQuestion(@PathVariable Long id) {
+        quizService.deleteQuestion(id);
+        return "redirect:/admin";
     }
 }
