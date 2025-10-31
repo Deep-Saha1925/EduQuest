@@ -117,6 +117,51 @@
                 </div>
             </div>
 
+            <!-- Timer Options -->
+            <div class="bg-gray-50 rounded-2xl p-6">
+                <label class="block text-lg font-semibold text-gray-700 mb-4">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Time Limit
+                </label>
+
+                <!-- Time Limit Options -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <label class="relative">
+                        <input type="radio" name="timeLimit" value="5" class="peer sr-only" />
+                        <div class="px-6 py-4 border-2 border-gray-300 rounded-xl cursor-pointer peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition duration-200 text-center">
+                            <div class="text-2xl font-bold text-gray-800">5</div>
+                            <div class="text-xs text-gray-600 mt-1">mins</div>
+                        </div>
+                    </label>
+
+                    <label class="relative">
+                        <input type="radio" name="timeLimit" value="10" checked class="peer sr-only" />
+                        <div class="px-6 py-4 border-2 border-gray-300 rounded-xl cursor-pointer peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition duration-200 text-center">
+                            <div class="text-2xl font-bold text-gray-800">10</div>
+                            <div class="text-xs text-gray-600 mt-1">mins</div>
+                        </div>
+                    </label>
+
+                    <label class="relative">
+                        <input type="radio" name="timeLimit" value="15" class="peer sr-only" />
+                        <div class="px-6 py-4 border-2 border-gray-300 rounded-xl cursor-pointer peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition duration-200 text-center">
+                            <div class="text-2xl font-bold text-gray-800">15</div>
+                            <div class="text-xs text-gray-600 mt-1">mins</div>
+                        </div>
+                    </label>
+
+                    <label class="relative">
+                        <input type="radio" name="timeLimit" value="20" class="peer sr-only" />
+                        <div class="px-6 py-4 border-2 border-gray-300 rounded-xl cursor-pointer peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition duration-200 text-center">
+                            <div class="text-2xl font-bold text-gray-800">20</div>
+                            <div class="text-xs text-gray-600 mt-1">mins</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <!-- Info Box -->
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
                 <div class="flex">

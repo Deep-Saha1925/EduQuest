@@ -30,6 +30,7 @@ public class QuizController {
     @GetMapping("/start")
     public String startQuiz(@RequestParam(defaultValue = "10") int count,
                             @RequestParam(required = false) String category,
+                            @RequestParam(defaultValue = "10") int timeLimit,
                             HttpSession session, Model model) {
         List<Question> questions;
 
@@ -45,8 +46,16 @@ public class QuizController {
         session.setAttribute("currentQuestionIndex", 0);
         session.setAttribute("userAnswers", new ArrayList<String>());
 
+        //set timer
+        long currentTime = System.currentTimeMillis();
+        long endTime = currentTime + (timeLimit * 60 * 1000);   //minutes to milliseconds
+        session.setAttribute("quizEndTime", endTime);
+        session.setAttribute("quizTimeLimit", timeLimit);
+
         if (questions.isEmpty()) {
             model.addAttribute("error", "No questions available for this category. Please try another category.");
+            List<String> categories = quizService.getAllCategories();
+            model.addAttribute("categories", categories);
             return "index";
         }
 
@@ -58,9 +67,15 @@ public class QuizController {
         @SuppressWarnings("unchecked")
         List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
         Integer currentIndex = (Integer) session.getAttribute("currentQuestionIndex");
+        Long endTime = (Long) session.getAttribute("quizEndTime");
 
         if (questions == null || currentIndex == null) {
             return "redirect:/";
+        }
+
+        //checking if time is up
+        if(endTime != null && System.currentTimeMillis() > endTime){
+            return "redirect:/quiz/timeout";
         }
 
         if (currentIndex >= questions.size()) {
@@ -71,6 +86,7 @@ public class QuizController {
         model.addAttribute("question", currentQuestion);
         model.addAttribute("questionNumber", currentIndex + 1);
         model.addAttribute("totalQuestions", questions.size());
+        model.addAttribute("quizEndTime", endTime);
 
         return "question";
     }
@@ -81,6 +97,12 @@ public class QuizController {
         @SuppressWarnings("unchecked")
         List<String> userAnswers = (List<String>) session.getAttribute("userAnswers");
         Integer currentIndex = (Integer) session.getAttribute("currentQuestionIndex");
+        Long endTime = (Long) session.getAttribute("quizEndTime");
+
+        // Check if time is up before processing answer
+        if (endTime != null && System.currentTimeMillis() > endTime) {
+            return "redirect:/quiz/timeout";
+        }
 
         if (userAnswers != null && currentIndex != null) {
             userAnswers.add(answer != null ? answer : "");
@@ -90,6 +112,24 @@ public class QuizController {
         return "redirect:/quiz/question";
     }
 
+    @GetMapping("/timeout")
+    public String quizTimeout(HttpSession session) {
+        @SuppressWarnings("unchecked")
+        List<Question> questions = (List<Question>) session.getAttribute("quizQuestions");
+        @SuppressWarnings("unchecked")
+        List<String> userAnswers = (List<String>) session.getAttribute("userAnswers");
+
+        // Fill remaining answers as empty
+        if (questions != null && userAnswers != null) {
+            while (userAnswers.size() < questions.size()) {
+                userAnswers.add("");
+            }
+        }
+
+        session.setAttribute("timedOut", true);
+        return "redirect:/quiz/result";
+    }
+
     @GetMapping("/result")
     public String showResult(HttpSession session, Model model) {
         @SuppressWarnings("unchecked")
@@ -97,6 +137,8 @@ public class QuizController {
         @SuppressWarnings("unchecked")
         List<String> userAnswers = (List<String>) session.getAttribute("userAnswers");
         String category = (String) session.getAttribute("quizCategory");
+        Integer timeLimit = (Integer) session.getAttribute("quizTimeLimit");
+        Boolean timedOut = (Boolean) session.getAttribute("timedOut");
 
         if (questions == null || userAnswers == null) {
             return "redirect:/";
@@ -112,6 +154,8 @@ public class QuizController {
         model.addAttribute("questions", questions);
         model.addAttribute("userAnswers", userAnswers);
         model.addAttribute("category", category != null ? category : "General");
+        model.addAttribute("timeLimit", timeLimit != null ? timeLimit : 0);
+        model.addAttribute("timedOut", timedOut != null && timedOut);
 
         return "result";
     }

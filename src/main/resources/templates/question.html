@@ -9,6 +9,22 @@
 <body class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 min-h-screen flex items-center justify-center p-4">
 <div class="max-w-4xl w-full">
     <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+
+        <!-- Timer Display -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-4">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-semibold text-gray-700">Time Remaining:</span>
+                </div>
+                <div id="timer" class="text-2xl font-bold text-orange-600">
+                    <span id="minutes">--</span>:<span id="seconds">--</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Progress Bar -->
         <div class="mb-8">
             <div class="flex justify-between items-center mb-2">
@@ -91,5 +107,42 @@
         </form>
     </div>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Get end time from server
+    const endTime = /*[[${quizEndTime}]]*/ 0;
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            // Time's up - redirect to timeout page
+            window.location.href = '/quiz/timeout';
+            return;
+        }
+
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+
+        // Change color when time is running low
+        const timerElement = document.getElementById('timer');
+        if (minutes < 1) {
+            timerElement.classList.add('text-red-600', 'animate-pulse');
+            timerElement.classList.remove('text-orange-600');
+        } else if (minutes < 3) {
+            timerElement.classList.add('text-orange-600');
+        }
+    }
+
+    // Update timer every second
+    updateTimer();
+    setInterval(updateTimer, 1000);
+    /*]]>*/
+</script>
 </body>
 </html>
