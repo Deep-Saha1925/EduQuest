@@ -18,7 +18,7 @@ public class AdminController {
         this.quizService = quizService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public String adminPanel(Model model) {
         model.addAttribute("questions", quizService.getAllQuestions());
         return "admin";
