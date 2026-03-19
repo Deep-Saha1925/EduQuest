@@ -1,229 +1,242 @@
-# Quiz Application - Subject-Based Selection
+# 🎓 EduQuest — Subject-Based Quiz Application
 
-A modern quiz application with subject-specific selection, interactive UI, and improved user experience.
+![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=flat-square&logo=springboot)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-blue?style=flat-square&logo=mysql)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3.1-green?style=flat-square)
+![Security](https://img.shields.io/badge/Spring%20Security-Protected-red?style=flat-square&logo=springsecurity)
 
----
-
-## 🎯 New Features
-
-### Subject Cards on Home Page
-Students now see beautiful, interactive cards for each subject category on the home page. Each card includes:
-
-- Category-specific icons (Networking, Java, Python, Database, Web Development)
-- Color-coded design for easy identification
-- Hover effects with smooth animations
-- Direct links to start a quiz in that subject
-
-### Category Selection Flow
-1. **Home Page (`/`)** - Displays all available subjects as cards
-2. **Category Selection (`/quiz/category/{category}`)** - Shows quiz configuration options
-3. **Quiz Questions (`/quiz/question`)** - Category-specific questions
-4. **Results Page (`/quiz/result`)** - Shows category badge and detailed results
+A full-stack quiz web application built with **Java Spring Boot** and **Thymeleaf**. Students can take subject-specific quizzes and admins can manage questions through a protected dashboard with bulk upload support.
 
 ---
 
-## 📋 Updated Files
+## 📌 Overview
 
-### Backend Changes
-
-**QuizController.java**
-- Added `getAllCategories()` to fetch unique categories
-- Added `/quiz/category/{category}` route for category selection
-- Updated `/quiz/start` to handle category-based quizzes
-- Updated `/quiz/result` to display quiz category
-
-**QuizService.java**
-- Added `getAllCategories()` to get distinct categories from database
-- Returns sorted list of all unique categories
-
-### Frontend Changes
-
-**index.html (Home Page)**
-- Redesigned with dynamic subject cards
-- Category-specific icons (5 predefined + default icon)
-- Responsive grid layout (1 column mobile, 2 columns tablet, 3 columns desktop)
-- Empty state when no questions are available
-
-**category-selection.html (NEW)**
-- Quiz configuration page for selected category
-- Shows available question count
-- Radio button selection for number of questions (5, 10, 15, 20)
-- Category-specific styling and icons
-- Back button to return to subject selection
-- Information box with quiz details
-
-**result.html**
-- Added category badge at the top
-- Shows which subject the quiz was taken from
+EduQuest allows students to select a subject, choose how many questions to attempt, take the quiz, and view their results — all without requiring a login. The admin panel is protected by Spring Security and lets admins add, edit, delete, and bulk upload questions via CSV or Excel.
 
 ---
 
-## 🎨 Design Features
+## 🚀 Features
+
+### 👨‍🎓 Student Features
+- Browse all available subjects on the home page as visual cards
+- Select number of questions (5, 10, 15, 20)
+- Take randomized subject-specific quizzes
+- View detailed results with score and category badge
+- No login required — fully open access
+
+### 🔑 Admin Features
+- Protected dashboard — login required to access `/admin/**`
+- Add, edit, and delete individual questions
+- Paginated question table with category filter dropdown
+- **Bulk upload** questions via `.csv` or `.xlsx` file
+- Flash messages for upload success/error feedback
+- Question stats (total, active, categories)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend** | Java 17, Spring Boot 3.x, Spring MVC |
+| **Frontend** | Thymeleaf, Plain CSS, Bootstrap Icons, DM Sans / DM Serif Display |
+| **Database** | MySQL with Spring Data JPA |
+| **Security** | Spring Security — admin routes protected, all quiz routes public |
+| **File Upload** | Apache POI (Excel) + OpenCSV (CSV) |
+
+---
+
+## 🎨 UI Design
+
+All pages use a consistent CSS variable system with purple/indigo as the primary accent.
 
 ### Color Coding by Subject
-- **Networking** - Blue theme
-- **Java** - Red theme
-- **Python** - Green theme
-- **Database** - Yellow theme
-- **Web Development** - Purple theme
-- **Other Categories** - Indigo theme (default)
-
-### Icons by Subject
-Each category has a unique SVG icon:
-
-| Category | Icon |
-|----------|------|
-| 🌐 Networking | Globe/Network icon |
-| ☕ Java | Code brackets icon |
-| 🐍 Python | Terminal/Code icon |
-| 🗄️ Database | Database cylinders icon |
-| 🌍 Web Development | Web/Globe icon |
-| 📚 Default | Book icon for other categories |
+| Subject | Theme |
+|---|---|
+| Networking | Blue |
+| Java | Red |
+| Python | Green |
+| Database | Yellow |
+| Web Development | Purple |
+| Other | Indigo (default) |
 
 ---
 
-## 🚀 User Flow
-Home Page
-↓
-Select Subject Card
-↓
-Category Selection Page (choose question count)
-↓
-Quiz Questions (category-specific)
-↓
-Results Page (with category badge)
-↓
-Try Again or Go Home
+## 📄 Pages & Routes
 
-pgsql
-Copy code
-
----
-
-## 📊 How It Works
-
-### Category Detection
-- Automatically detects all unique categories from the `questions` table
-- Auto-discovered from existing questions
-- Sorted alphabetically
-- Filters out null/empty values
-
-### Question Selection
-- System fetches all questions from the selected category
-- Randomly selects the specified number of questions
-- Presents questions one by one
-- Tracks the category throughout the session
-
-### Database Query Example
-```sql
-SELECT * FROM questions 
-WHERE category = 'Java' 
-ORDER BY RAND() 
-LIMIT 10;
-🎓 Benefits
-Focused Learning - Practice specific subjects
-
-Better Organization - Questions grouped by topic
-
-Improved UX - Visual, card-based interface
-
-Flexible - Easy to add new categories
-
-Responsive - Works on all device sizes
-
-🔧 Technical Details
-Session Variables
-quizQuestions - List of selected questions
-
-quizCategory - Current quiz category
-
-currentQuestionIndex - Progress tracker
-
-userAnswers - Student's responses
-
-Routes Summary
-Route	Method	Purpose
-/	GET	Home page with subject cards
-/quiz/category/{category}	GET	Category selection page
-/quiz/start?count={n}&category={cat}	GET	Start category-specific quiz
-/quiz/question	GET	Display current question
-/quiz/answer	POST	Submit answer and move to next
-/quiz/result	GET	Show final results
-/admin	GET	Admin panel
-
-🎯 Demo Data
-The SQL script includes 125 questions across 5 categories:
-
-Networking - 25 questions
-
-Java - 25 questions
-
-Python - 25 questions
-
-Database - 25 questions
-
-Web Development - 25 questions
-
-💡 Future Enhancements
-⏱️ Timer for each question
-
-📊 Subject-wise performance analytics
-
-🏆 Leaderboard per category
-
-🔒 User authentication
-
-📱 Progressive Web App (PWA)
-
-📧 Email results
-
-📄 PDF certificate generation
-
-🎮 Gamification (badges, points)
-
-🐛 Troubleshooting
-No subjects showing?
-
-Ensure questions exist in the database
-
-Verify category field is filled
-
-Run the demo SQL script to populate data
-
-Category not working?
-
-Verify category names match exactly (case-sensitive)
-
-Check MySQL connection settings
-
-Ensure quiz_db database exists
-
-Styling issues?
-
-Clear browser cache
-
-Check internet connection (Tailwind CSS loads from CDN)
-
-Ensure all HTML files are in src/main/resources/templates/
-
-📝 Notes
-Categories are case-sensitive in the database
-
-Empty categories won’t appear on the home page
-
-Questions are selected randomly each time
-
-Session data is cleared when starting a new quiz
-
-Admin panel remains unchanged for managing questions
-
-Enjoy your enhanced Quiz Application! 🎉
-
-yaml
-Copy code
+| Page | Route | Access |
+|---|---|---|
+| Home — Subject Cards | `/` | Public |
+| Category Selection | `/quiz/category/{category}` | Public |
+| Quiz Question | `/quiz/question` | Public |
+| Submit Answer | `/quiz/answer` | Public |
+| Results | `/quiz/result` | Public |
+| Admin Dashboard | `/admin` | Login Required |
+| Admin Upload | `/admin/upload` | Login Required |
+| Add Question | `/admin/question/new` | Login Required |
+| Edit Question | `/admin/question/edit/{id}` | Login Required |
+| Delete Question | `/admin/question/delete/{id}` | Login Required |
+| Login | `/login` | Public |
 
 ---
 
-I can also **convert this README into a GitHub-friendly version with badges, GIF demo, and collapsible sections** to make it more attractive for your repo.  
+## 🔐 Security
 
-Do you want me to do that next?
+Only `/admin/**` routes require authentication. Everything else is freely accessible.
+
+```java
+.requestMatchers("/admin/**").authenticated()
+.anyRequest().permitAll()
+```
+
+Admin credentials are configured in `SecurityConfig.java`:
+- **Username:** `admin`
+- **Password:** `admin123` *(change before deploying)*
+
+---
+
+## 📦 Bulk Upload
+
+Admins can upload questions in bulk via the admin panel. Supported formats: `.csv`, `.xlsx`, `.xls`
+
+### Required Column Order
+
+| Column | Description |
+|---|---|
+| `questionText` | The question |
+| `optionA` | Option A |
+| `optionB` | Option B |
+| `optionC` | Option C |
+| `optionD` | Option D |
+| `correctAnswer` | Exact text of correct option |
+| `category` | Subject name (e.g. Java, Python) |
+| `difficulty` | Easy / Medium / Hard |
+
+### Sample CSV Row
+```
+What is a pointer in C?,A variable storing address,A loop,A function,A constant,A variable storing address,C,Medium
+```
+
+---
+
+## 📂 Project Structure
+
+```
+src/main/java/com/deep/EduQuest/
+│── controller/
+│   ├── QuizController.java       # Student quiz routes
+│   ├── AdminController.java      # Admin CRUD + upload
+│   └── LoginController.java      # Login + access-denied
+│── model/
+│   └── Question.java             # Question entity
+│── repository/
+│   └── QuestionRepository.java   # JPA + custom queries
+│── service/
+│   ├── QuizService.java          # Quiz logic, pagination, categories
+│   └── FileUploadService.java    # CSV and Excel parsing
+│── config/
+│   └── SecurityConfig.java       # Spring Security config
+
+src/main/resources/templates/
+│── index.html                    # Home — subject cards
+│── category-selection.html       # Quiz config page
+│── question.html                 # Quiz question view
+│── result.html                   # Results with category badge
+│── admin.html                    # Admin dashboard
+│── login.html                    # Admin login page
+│── access-denied.html            # 403 page
+```
+
+---
+
+## ⚙️ Session Variables
+
+| Variable | Purpose |
+|---|---|
+| `quizQuestions` | List of selected questions |
+| `quizCategory` | Current quiz subject |
+| `currentQuestionIndex` | Progress tracker |
+| `userAnswers` | Student's responses |
+
+---
+
+## ▶️ Running the Project
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/eduquest.git
+cd eduquest
+```
+
+### 2. Configure MySQL
+Update `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/quiz_db
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.hibernate.ddl-auto=update
+```
+
+### 3. Run the Application
+```bash
+mvn spring-boot:run
+```
+
+Then open [http://localhost:8080](http://localhost:8080)
+
+Admin panel: [http://localhost:8080/admin](http://localhost:8080/admin)
+
+---
+
+## 📊 Demo Data
+
+The project includes sample question CSV files covering:
+
+| Category | Questions |
+|---|---|
+| C | 25 |
+| Java | 25 |
+| Python | 25 |
+| DBMS | 25 |
+| OS | 25 |
+| DSA | 25 |
+
+Upload any of these via the bulk upload feature in the admin panel.
+
+---
+
+## 🐛 Troubleshooting
+
+**No subjects showing on home page?**
+- Ensure questions exist in the database with a filled `category` field
+- Upload sample questions via the admin bulk upload
+
+**Category filter not working?**
+- Category names are case-sensitive — ensure they match exactly in the database
+
+**Admin page not accessible?**
+- Navigate to `/login` and use credentials `admin` / `admin123`
+- Ensure Spring Security dependency is in `pom.xml`
+
+**File upload failing?**
+- Ensure Apache POI and OpenCSV are in `pom.xml`
+- Check that column order matches exactly: `questionText, optionA, optionB, optionC, optionD, correctAnswer, category, difficulty`
+
+---
+
+## 📌 Future Enhancements
+- ⏱️ Timer per question
+- 📊 Subject-wise performance analytics
+- 🏆 Leaderboard per category
+- 👤 Student login and history tracking
+- 📱 Progressive Web App (PWA)
+- 📄 PDF certificate generation
+- 🎮 Gamification — badges and points
+- 📧 Email results
+
+---
+
+## 🏆 Conclusion
+
+EduQuest provides a clean, organized, and secure platform for subject-based quizzing. Built on Spring Boot with a modern CSS frontend, it features admin-only protection, bulk question management, category filtering with pagination, and a smooth student quiz experience — all ready to extend further.
