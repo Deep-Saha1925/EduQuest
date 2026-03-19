@@ -3,6 +3,7 @@ package com.deep.EduQuest.controller;
 import com.deep.EduQuest.model.Question;
 import com.deep.EduQuest.service.QuizService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,9 +19,24 @@ public class AdminController {
         this.quizService = quizService;
     }
 
+//    @GetMapping
+//    public String adminPanel(Model model) {
+//        model.addAttribute("questions", quizService.getAllQuestions());
+//        return "admin";
+//    }
+
     @GetMapping
-    public String adminPanel(Model model) {
-        model.addAttribute("questions", quizService.getAllQuestions());
+    public String adminPanel(Model model,
+                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size
+                             ){
+        Page<Question> questionPage = quizService.getAllQuestionsPaginated(page, size);
+        model.addAttribute("questions",    questionPage.getContent());
+        model.addAttribute("currentPage",  questionPage.getNumber());
+        model.addAttribute("totalPages",   questionPage.getTotalPages());
+        model.addAttribute("totalItems",   questionPage.getTotalElements());
+        model.addAttribute("pageSize",     size);
+
         return "admin";
     }
 
@@ -53,5 +69,4 @@ public class AdminController {
         quizService.deleteQuestion(id);
         return "redirect:/admin";
     }
-
 }

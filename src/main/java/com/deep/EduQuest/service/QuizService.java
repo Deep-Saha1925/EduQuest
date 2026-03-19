@@ -3,6 +3,9 @@ package com.deep.EduQuest.service;
 import com.deep.EduQuest.model.Question;
 import com.deep.EduQuest.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,6 +54,11 @@ public class QuizService {
             }
         }
         return score;
+    }
+
+    public Page<Question> getAllQuestionsPaginated(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return questionRepository.findAll(pageable);
     }
 
     public List<String> getAllCategories() {
