@@ -1,6 +1,7 @@
 package com.deep.EduQuest.controller;
 
 import com.deep.EduQuest.model.Question;
+import com.deep.EduQuest.service.FileUploadService;
 import com.deep.EduQuest.service.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -8,15 +9,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final QuizService quizService;
+    private final FileUploadService fileUploadService;
 
-    public AdminController(QuizService quizService) {
+    public AdminController(QuizService quizService, FileUploadService fileUploadService) {
         this.quizService = quizService;
+        this.fileUploadService = fileUploadService;
     }
 
 //    @GetMapping
@@ -75,4 +82,25 @@ public class AdminController {
         quizService.deleteQuestion(id);
         return "redirect:/admin";
     }
+
+    @PostMapping("/upload")
+    public String uploadQuestions(@RequestParam("file")MultipartFile file,
+                                  RedirectAttributes redirectAttributes){
+
+        if(file.isEmpty()){
+            redirectAttributes.addFlashAttribute("uploadError", "Please select a file.");
+            return "redirect:/admin";
+        }
+
+        try{
+            List<Question> questions = fileUploadService.parseFile(file);
+            questions.forEach(quizService::saveQuestion);
+            redirectAttributes.addFlashAttribute("uploadSuccess", questions.size() + " questions uploaded successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("uploadError",
+                    "Upload failed: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
 }
