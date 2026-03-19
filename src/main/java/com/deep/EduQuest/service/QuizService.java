@@ -64,4 +64,8 @@ public class QuizService {
     public List<String> getAllCategories() {
         return questionRepository.getAllCategories();
     }
+
+    public int getTotalsQuestions() {
+        return questionRepository.findAll().size();
+    }
 }

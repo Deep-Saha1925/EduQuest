@@ -31,6 +31,8 @@ public class AdminController {
                              @RequestParam(defaultValue = "10") int size
                              ){
         Page<Question> questionPage = quizService.getAllQuestionsPaginated(page, size);
+        int totalQuestions = quizService.getTotalsQuestions();
+        model.addAttribute("totalQuestions", totalQuestions);
         model.addAttribute("questions",    questionPage.getContent());
         model.addAttribute("currentPage",  questionPage.getNumber());
         model.addAttribute("totalPages",   questionPage.getTotalPages());
