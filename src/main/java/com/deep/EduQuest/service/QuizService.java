@@ -68,4 +68,15 @@ public class QuizService {
     public int getTotalsQuestions() {
         return questionRepository.findAll().size();
     }
+
+    public Page<Question> findByCategoryPaginated(String category, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        if(category == null || category.isEmpty()){
+            return questionRepository.findAll(pageable);
+        }
+
+        return questionRepository.findByCategoryPaginated(category, pageable);
+    }
+
+
 }

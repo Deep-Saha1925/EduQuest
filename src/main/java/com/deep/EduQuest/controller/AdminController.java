@@ -28,16 +28,20 @@ public class AdminController {
     @GetMapping
     public String adminPanel(Model model,
                              @RequestParam(defaultValue = "0") int page,
-                             @RequestParam(defaultValue = "10") int size
+                             @RequestParam(defaultValue = "10") int size,
+                             @RequestParam(required = false, defaultValue = "") String category
                              ){
-        Page<Question> questionPage = quizService.getAllQuestionsPaginated(page, size);
-        int totalQuestions = quizService.getTotalsQuestions();
-        model.addAttribute("totalQuestions", totalQuestions);
+
+        category = category.trim();
+        Page<Question> questionPage = quizService.findByCategoryPaginated(category, page, size);
         model.addAttribute("questions",    questionPage.getContent());
         model.addAttribute("currentPage",  questionPage.getNumber());
         model.addAttribute("totalPages",   questionPage.getTotalPages());
         model.addAttribute("totalItems",   questionPage.getTotalElements());
         model.addAttribute("pageSize",     size);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("categories",      quizService.getAllCategories());
+        model.addAttribute("totalQuestions",  quizService.getAllQuestions().size());
 
         return "admin";
     }

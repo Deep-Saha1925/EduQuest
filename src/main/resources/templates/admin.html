@@ -108,7 +108,16 @@
         .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1; }
 
-        /* ── Add button ── */
+        /* ── Toolbar: add button + filter ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
         .btn-add {
             display: inline-flex;
             align-items: center;
@@ -122,10 +131,47 @@
             text-decoration: none;
             box-shadow: 0 4px 14px rgba(124,58,237,0.35);
             transition: opacity 0.2s, transform 0.2s;
-            margin-bottom: 24px;
             font-family: 'DM Sans', sans-serif;
         }
         .btn-add:hover { opacity: 0.9; transform: scale(1.03); }
+
+        /* ── Filter bar ── */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Filter dropdown */
+        .filter-select {
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 36px 8px 14px;
+            font-size: 0.85rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            color: var(--text);
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 12px center;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-width: 180px;
+        }
+        .filter-select:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        }
+        .filter-select:hover { border-color: var(--purple); }
 
         /* ── Table card ── */
         .table-card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
@@ -134,6 +180,11 @@
             padding: 18px 24px;
             background: #f9fafb;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .table-header h2 {
@@ -142,6 +193,26 @@
             font-weight: 400;
             color: var(--text);
         }
+
+        .table-header .active-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ede9fe;
+            color: var(--purple);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .active-filter a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .active-filter a:hover { opacity: 0.7; }
 
         /* ── Empty state ── */
         .empty-state { padding: 60px 24px; text-align: center; }
@@ -235,7 +306,6 @@
         }
 
         .pagination-info { font-size: 0.83rem; color: var(--text-muted); }
-
         .pagination-pages { display: flex; align-items: center; gap: 4px; }
 
         .page-btn {
@@ -266,6 +336,7 @@
             .main { padding: 16px; }
             .header-inner { padding: 18px 16px; }
             header h1 { font-size: 1.5rem; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -307,30 +378,55 @@
             <div class="stat-icon icon-indigo"><i class="bi bi-collection"></i></div>
             <div>
                 <p class="stat-label">Categories</p>
-                <p class="stat-value">All</p>
+                <p class="stat-value" th:text="${#lists.size(categories)}">0</p>
             </div>
         </div>
     </div>
 
-    <!-- Add New Question Button -->
-    <a href="/admin/question/new" class="btn-add">
-        <i class="bi bi-plus-circle"></i>
-        Add New Question
-    </a>
+    <!-- Toolbar: Add button + Category filter pills -->
+    <div class="toolbar">
+        <a href="/admin/question/new" class="btn-add">
+            <i class="bi bi-plus-circle"></i>
+            Add New Question
+        </a>
 
-    sjdfjsg
+        <!-- Filter dropdown -->
+        <div class="filter-bar">
+            <span class="filter-label"><i class="bi bi-funnel"></i> Category:</span>
+            <select class="filter-select"
+                    th:data-size="${pageSize}"
+                    onchange="window.location.href='/admin?page=0&size='+this.dataset.size+'&category='+encodeURIComponent(this.value)">
+                <option value="">All Categories</option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat}"
+                        th:text="${cat}"
+                        th:selected="${cat == selectedCategory}">
+                </option>
+            </select>
+        </div>
+    </div>
 
     <!-- Questions Table -->
     <div class="table-card">
         <div class="table-header">
             <h2>All Questions</h2>
+            <!-- Show active filter tag if a category is selected -->
+            <span th:if="${selectedCategory != null and selectedCategory != ''}" class="active-filter">
+                <i class="bi bi-tag-fill"></i>
+                <span th:text="${selectedCategory}"></span>
+                <a th:href="@{/admin(page=0, size=${pageSize})}">&#x2715;</a>
+            </span>
         </div>
 
         <!-- Empty state -->
         <div th:if="${#lists.isEmpty(questions)}" class="empty-state">
             <i class="bi bi-inbox"></i>
-            <h3>No questions yet</h3>
-            <p>Get started by creating your first question</p>
+            <h3>No questions found</h3>
+            <p th:if="${selectedCategory != null and selectedCategory != ''}"
+               th:text="'No questions in the &quot;' + ${selectedCategory} + '&quot; category yet.'"></p>
+            <p th:unless="${selectedCategory != null and selectedCategory != ''}">
+                Get started by creating your first question
+            </p>
             <a href="/admin/question/new" class="btn-create">
                 <i class="bi bi-plus-circle"></i>
                 Create Question
@@ -384,46 +480,46 @@
             <!-- Pagination bar -->
             <div class="pagination-bar">
 
-                <!-- Showing X–Y of Z -->
                 <p class="pagination-info"
                    th:text="'Showing ' + (${currentPage} * ${pageSize} + 1) + '–' +
                             (${currentPage} * ${pageSize} + ${#lists.size(questions)}) +
                             ' of ' + ${totalItems} + ' questions'">
                 </p>
 
-                <!-- Page number buttons -->
                 <div class="pagination-pages">
-                    <a th:href="@{/admin(page=${currentPage - 1}, size=${pageSize})}"
+                    <a th:href="@{/admin(page=${currentPage - 1}, size=${pageSize}, category=${selectedCategory != null and selectedCategory != '' ? selectedCategory : null})}"
                        th:classappend="${currentPage == 0} ? 'disabled'"
                        class="page-btn">
                         <i class="bi bi-chevron-left"></i>
                     </a>
 
                     <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                        <a th:href="@{/admin(page=${i}, size=${pageSize})}"
+                        <a th:href="@{/admin(page=${i}, size=${pageSize}, category=${selectedCategory != null and selectedCategory != '' ? selectedCategory : null})}"
                            th:text="${i + 1}"
                            th:classappend="${i == currentPage} ? 'active'"
                            class="page-btn">
                         </a>
                     </th:block>
 
-                    <a th:href="@{/admin(page=${currentPage + 1}, size=${pageSize})}"
+                    <a th:href="@{/admin(page=${currentPage + 1}, size=${pageSize}, category=${selectedCategory != null and selectedCategory != '' ? selectedCategory : null})}"
                        th:classappend="${currentPage + 1 == totalPages} ? 'disabled'"
                        class="page-btn">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </div>
 
-                <!-- Rows per page -->
                 <div class="page-size-wrap">
                     <span>Rows per page:</span>
-                    <select class="page-size-select"
-                            onchange="window.location.href='/admin?page=0&size='+this.value">
-                        <option th:value="5"  th:selected="${pageSize == 5}">5</option>
-                        <option th:value="10" th:selected="${pageSize == 10}">10</option>
-                        <option th:value="20" th:selected="${pageSize == 20}">20</option>
-                        <option th:value="50" th:selected="${pageSize == 50}">50</option>
-                    </select>
+                    <form method="get" action="/admin" style="display:inline;">
+                        <input type="hidden" name="page" value="0">
+                        <input type="hidden" name="category" th:value="${selectedCategory}">
+                        <select name="size" class="page-size-select" onchange="this.form.submit()">
+                            <option th:value="5"  th:selected="${pageSize == 5}">5</option>
+                            <option th:value="10" th:selected="${pageSize == 10}">10</option>
+                            <option th:value="20" th:selected="${pageSize == 20}">20</option>
+                            <option th:value="50" th:selected="${pageSize == 50}">50</option>
+                        </select>
+                    </form>
                 </div>
 
             </div>
